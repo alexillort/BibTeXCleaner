@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Limpia, organiza y completa tus referencias BibTeX en un espacio de trabajo local.">
+  <title>BibTeX Cleaner · Tu bibliografía, en orden</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="/" aria-label="BibTeX Cleaner, inicio"><span class="brand-icon">{b}</span><span>BibTeX <strong>Cleaner</strong></span><span class="version">2.0</span></a>
+    <div class="header-note"><span class="status-dot"></span> Espacio de trabajo local</div>
+  </header>
+  <main>
+    <section class="intro">
+      <div><div class="eyebrow">MENOS FORMATO. MÁS INVESTIGACIÓN.</div><h1>Tu bibliografía, en orden<span>.</span></h1><p>Importa, ajusta y exporta. Todo en un mismo lugar.</p></div>
+      <div class="intro-actions"><button id="sampleBtn" class="button subtle">Probar un ejemplo</button><button id="importBtn" class="button secondary"><span aria-hidden="true">↥</span> Importar .bib</button></div>
+      <input type="file" id="fileInput" accept=".bib,.txt" hidden>
+    </section>
+    <div class="workspace">
+      <aside class="settings card" aria-label="Opciones de limpieza">
+        <div class="settings-heading"><div><span class="eyebrow">CONFIGURACIÓN</span><h2>A tu manera</h2></div><button id="resetBtn" class="icon-button" title="Restablecer opciones" aria-label="Restablecer opciones">↺</button></div>
+        <div class="tabs" role="tablist" aria-label="Grupos de opciones">
+          <button id="tab-clean" role="tab" aria-selected="true" aria-controls="panel-clean" data-panel="clean">Limpieza</button>
+          <button id="tab-fields" role="tab" aria-selected="false" aria-controls="panel-fields" data-panel="fields" tabindex="-1">Campos</button>
+          <button id="tab-doi" role="tab" aria-selected="false" aria-controls="panel-doi" data-panel="doi" tabindex="-1">DOI</button>
+        </div>
+        <div class="settings-body">
+          <section id="panel-clean" role="tabpanel" aria-labelledby="tab-clean">
+            <p class="panel-hint">Los pequeños detalles hacen una buena bibliografía.</p>
+            <label class="option"><span><strong>Normalizar espacios</strong><small>Quita saltos y espacios extra</small></span><input type="checkbox" data-opt="clean_whitespace" checked><span class="switch" aria-hidden="true"></span></label>
+            <label class="option"><span><strong>Quitar campos vacíos</strong><small>Conserva solo la información útil</small></span><input type="checkbox" data-opt="remove_empty" checked><span class="switch" aria-hidden="true"></span></label>
+            <label class="option"><span><strong>Eliminar duplicados</strong><small>Compara claves y DOI existentes</small></span><input type="checkbox" data-opt="remove_duplicates"><span class="switch" aria-hidden="true"></span></label>
+            <label class="option"><span><strong>Ordenar campos A–Z</strong><small>Un formato uniforme en cada entrada</small></span><input type="checkbox" data-opt="sort_fields" checked><span class="switch" aria-hidden="true"></span></label>
+            <label class="option"><span><strong>Proteger mayúsculas</strong><small>Añade llaves al título</small></span><input type="checkbox" data-opt="enclose_braces"><span class="switch" aria-hidden="true"></span></label>
+            <label class="option"><span><strong>Generar claves</strong><small>Apellido + año + primera palabra</small></span><input type="checkbox" data-opt="generate_keys"><span class="switch" aria-hidden="true"></span></label>
+            <label class="field-label" for="sortBy">Orden de las referencias</label><select id="sortBy"><option value="none">Mantener orden original</option><option value="author">Autor · A–Z</option><option value="year">Año · ascendente</option><option value="title">Título · A–Z</option><option value="ID">Clave · A–Z</option></select>
+          </section>
+          <section id="panel-fields" role="tabpanel" aria-labelledby="tab-fields" hidden>
+            <p class="panel-hint">Decide qué información conservar en tu archivo.</p>
+            <label class="field-label" for="removeFields">Campos que quieres quitar</label><textarea id="removeFields" class="field-text" rows="3" placeholder="abstract, keywords, file"></textarea><p class="help">Separa los nombres con comas.</p>
+            <label class="field-label" for="addFields">Campos que quieres añadir</label><textarea id="addFields" class="field-text" rows="3" placeholder="language=spanish, note=preprint"></textarea><p class="help">Formato campo=valor. Solo se añaden si no existen. Para incluir una coma: "note=uno, dos".</p>
+            <div class="callout">Los nombres de campo se normalizan a minúsculas al leer el BibTeX.</div>
+          </section>
+          <section id="panel-doi" role="tabpanel" aria-labelledby="tab-doi" hidden>
+            <p class="panel-hint">Completa las referencias que aún no tienen DOI.</p>
+            <label class="option"><span><strong>Buscar DOI faltantes</strong><small>arXiv y Crossref</small></span><input type="checkbox" data-opt="find_dois"><span class="switch" aria-hidden="true"></span></label>
+            <div class="doi-steps"><span>01</span><div><strong>Primero, tus metadatos</strong><p>Si existe un identificador arXiv, el DOI se obtiene al instante.</p></div><span>02</span><div><strong>Después, una búsqueda</strong><p>Consulta título y autor en arXiv o Crossref. Puede tardar varios segundos por referencia.</p></div></div>
+            <div class="callout">Al activarlo, los títulos y autores se envían a estos servicios. Revisa las coincidencias antes de publicar.</div>
+          </section>
+        </div>
+        <div class="settings-footer"><button id="runBtn" class="button primary" disabled><span class="run-icon" aria-hidden="true">✦</span><span id="runLabel">Limpiar bibliografía</span></button><span class="shortcut">Ctrl / ⌘ + Enter para ejecutar</span></div>
+      </aside>
+      <section class="editors" aria-label="Editor de bibliografía">
+        <div class="summary-strip"><span class="summary-title"><span class="status-dot"></span> Vista de trabajo</span><div class="stats" aria-label="Resumen"><span><b id="statEntries">—</b> referencias</span><span><b id="statDuplicates">—</b> duplicados</span><span><b id="statDois">—</b> DOI añadidos</span></div></div>
+        <div class="editor-grid">
+          <section class="editor card" id="dropZone" aria-label="Entrada BibTeX">
+            <div class="editor-header"><div><span class="step">01</span><h2>Original</h2><span id="inputCount" class="count">0 entradas</span></div><button id="clearBtn" class="text-button">Vaciar</button></div>
+            <div class="editor-meta"><span id="filename">Pega texto o arrastra un archivo .bib</span><span>BIB</span></div>
+            <div class="code-container"><textarea id="inputArea" class="code-editor" aria-label="Contenido BibTeX original" spellcheck="false" placeholder="@article{tuReferencia,&#10;  author  = {Apellido, Nombre},&#10;  title   = {Una gran idea empieza aquí},&#10;  year    = {2026}&#10;}&#10;&#10;Pega tu bibliografía aquí…"></textarea></div>
+            <div class="editor-footer"><span id="inputSize">0 caracteres</span><span>Original editable</span></div>
+          </section>
+          <section class="editor card result-editor" aria-label="Resultado">
+            <div class="editor-header"><div><span class="step green">02</span><h2>Resultado</h2></div><div class="result-actions"><button id="copyBtn" class="text-button" disabled>Copiar</button><button id="downloadBtn" class="button small" disabled>↓ Descargar .bib</button></div></div>
+            <div class="editor-meta"><span id="outputMeta">Tu archivo limpio aparecerá aquí</span><span id="outputBadge">BIB</span></div>
+            <div class="code-container output-container"><div id="emptyState" class="empty-state"><div class="empty-art" aria-hidden="true"><span>{ }</span><i>✓</i></div><h3>Lista para tu próxima cita</h3><p>Ajusta las opciones y limpia tu bibliografía.<br>Tu archivo original seguirá disponible.</p></div><textarea id="outputText" class="code-editor" aria-label="BibTeX limpio" readonly spellcheck="false" hidden></textarea></div>
+            <div class="editor-footer"><span id="outputSize">Sin procesar</span><span id="outputState">Esperando tu bibliografía</span></div>
+          </section>
+        </div>
+        <section class="activity card" aria-label="Registro de cambios"><div class="activity-bar"><div id="status" role="status" aria-live="polite"><span class="status-dot"></span><span id="statusText">Todo listo. Importa un archivo o prueba el ejemplo.</span></div><button id="logBtn" class="text-button" aria-expanded="false" aria-controls="logContent">Ver actividad <span id="logCount">0</span> <span aria-hidden="true">⌃</span></button></div><div id="logContent" class="log-content" hidden><p>Los cambios aparecerán aquí después de limpiar.</p></div></section>
+      </section>
+    </div>
+    <footer class="page-footer"><span>BibTeX Cleaner <span class="footer-dot">·</span> Hecho para concentrarte en tus ideas.</span><span>Procesamiento local <span class="footer-dot">·</span> UTF-8</span></footer>
+  </main>
+</body>
+</html>
